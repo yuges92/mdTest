@@ -120,7 +120,7 @@ class ExpenseControllerTest extends TestCase
     }
 
     /**
-     * Test for retrieving an expenses
+     * Test for updating an expenses that doesn't exist. Validation test
      * @test
      */
     public function cannotUpdateAExpenseThatDoesNotExist()
@@ -147,7 +147,7 @@ class ExpenseControllerTest extends TestCase
     }
 
     /**
-     * Test for deleting an expenses
+     * Validation test for  deleting an expenses that doesn't exist
      * @test
      */
     public function cannotDeleteAExpenseThatDoesNotExist()
