@@ -8,7 +8,8 @@ use Tests\TestCase;
 class ExpenseControllerTest extends TestCase
 {
 
-    private $tableName="expenses";
+    private $tableName = "expenses";
+
     /**
      * testing for listing all the expenses
      * @test
@@ -40,6 +41,36 @@ class ExpenseControllerTest extends TestCase
 
     }
 
+
+    /**
+     * Test for creating a new expenses
+     * @test
+     */
+    public function canReturnValidationError()
+    {
+
+        $expenseData = [];
+        $response = $this->postJson(route('expenses.store'), $expenseData);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['description', 'value']);
+
+    }
+
+    /**
+     * Test for creating a new expenses
+     * @test
+     */
+    public function cannotCreateANewExpenseWithDifferentValueType()
+    {
+
+        $expenseData = Expense::factory()->make()->toArray();
+        $expenseData['value'] = 'String Value';
+        $response = $this->postJson(route('expenses.store'), $expenseData);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['value']);
+
+    }
+
     /**
      * Test for retrieving an expenses
      * @test
@@ -56,6 +87,16 @@ class ExpenseControllerTest extends TestCase
         $this->assertEquals($expense->id, $responseDecoded['id']);
         $this->assertEquals($expense->description, $responseDecoded['description']);
         $this->assertEquals($expense->value, $responseDecoded['value']);
+    }
+
+    /**
+     * Test for retrieving an expenses
+     * @test
+     */
+    public function cannotGetAExpenseThatDoesNotExist()
+    {
+        $response = $this->getJson(route('expenses.show', 1));
+        $response->assertStatus(404);
     }
 
     /**
@@ -78,6 +119,18 @@ class ExpenseControllerTest extends TestCase
         $this->assertEquals($expenseUpdated->value, $responseDecoded['value']);
     }
 
+    /**
+     * Test for retrieving an expenses
+     * @test
+     */
+    public function cannotUpdateAExpenseThatDoesNotExist()
+    {
+        $dataToUpdate = Expense::factory()->make()->toArray();
+        $response = $this->putJson(route('expenses.update', 1), $dataToUpdate);
+        $this->assertDatabaseCount($this->tableName, 0);
+        $this->assertDatabaseMissing($this->tableName, $dataToUpdate);
+        $response->assertStatus(404);
+    }
 
     /**
      * Test for deleting an expenses
@@ -92,4 +145,16 @@ class ExpenseControllerTest extends TestCase
         $this->assertDatabaseCount($this->tableName, 0);
         $this->assertDatabaseMissing($this->tableName, $expense->only(['description', 'value']));
     }
+
+    /**
+     * Test for deleting an expenses
+     * @test
+     */
+    public function cannotDeleteAExpenseThatDoesNotExist()
+    {
+        $response = $this->deleteJson(route('expenses.destroy', 1));
+        $response->assertStatus(404);
+    }
+
+
 }
