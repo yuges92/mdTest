@@ -1,2 +1,2 @@
-#assumtions
-more than 1 same type of expense allowed
+# Assumptions
+- more than 1 same type of expense allowed
